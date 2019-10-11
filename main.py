@@ -3,7 +3,9 @@ from evaluation import Judge
 import model
 import networkx as nx
 
+# The sample size of testing set
 SAMPLE_SIZE = 10000
+# the k in F1@k, recall@k, precision@k
 AT = 100
 
 def construct_graph_with_relation(input_file_name, verbose=False):
