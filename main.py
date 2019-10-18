@@ -35,7 +35,7 @@ if __name__ == '__main__':
     
     judge = Judge(G)
     judge.sample(SAMPLE_SIZE)
-    models = [model.CommonNeighbor, model.Jaccard]
+    models = [model.CommonNeighbor, model.Jaccard, model.AdamicAdar, model.PreferentialAttachment, model.TotalNeighbors]
     for model in models:
         print('we are evalute {0} model ...'.format(model.name()))
         metrics = judge.evaluate(model, AT)
