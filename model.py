@@ -32,8 +32,8 @@ class AdamicAdar(Model):
     def predict(G, node1, node2):
         n1 = set(G.neighbors(node1))
         n2 = set(G.neighbors(node2))
-        cn_list = n1.intersection(n2)
-        return sum(( 1/math.log(len(G.neighbors(i))) for i in cn_list ))
+        cn_set = n1.intersection(n2)
+        return sum(( 1/math.log(len(G.neighbors(i))) for i in cn_set ))
 
 # the product of the degree of each node
 class PreferentialAttachment(Model):
