@@ -28,7 +28,7 @@ def construct_graph_with_relation(input_file_name, verbose=False):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('input', type=str, help='Enter Input File')
+    parser.add_argument('--input', type=str, help='Enter Input File')
     args = parser.parse_args()
     
     G = construct_graph_with_relation(args.input, verbose=True)
