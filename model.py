@@ -33,7 +33,7 @@ class AdamicAdar(Model):
         n1 = set(G.neighbors(node1))
         n2 = set(G.neighbors(node2))
         cn_set = n1.intersection(n2)
-        return sum(( 1/math.log(len(G.neighbors(i))) for i in cn_set ))
+        return sum(( 1/math.log(sum(1 for _ in G.neighbors(i))) for i in cn_set ))
 
 # the product of the degree of each node
 class PreferentialAttachment(Model):
