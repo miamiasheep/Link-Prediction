@@ -1,4 +1,5 @@
 import argparse
+from util import size
 from evaluation import Judge
 import model
 import networkx as nx
@@ -26,13 +27,22 @@ def construct_graph_with_relation(input_file_name, verbose=False):
         count += 1
     return G
 
+def data_analysis(G):
+    nodes = size(G.nodes())
+    edges = size(G.edges())
+    print('nodes: {}'.format(nodes))
+    print('edges: {}'.format(edges))
+    print('average degree: {}'.format(edges/nodes))
+    print('max degree: {}'.format(max(size(G.neighbors(n)) for n in G.nodes())))
+    print('min degree: {}'.format(min(size(G.neighbors(n)) for n in G.nodes())))
+    
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', type=str, help='Enter Input File')
     args = parser.parse_args()
     
     G = construct_graph_with_relation(args.input, verbose=True)
-    
+    data_analysis(G)
     judge = Judge(G)
     judge.sample(SAMPLE_SIZE)
     models = [model.CommonNeighbor, model.Jaccard, model.AdamicAdar, model.PreferentialAttachment, model.TotalNeighbors]
