@@ -1,13 +1,11 @@
+import os
+import csv
 import argparse
+import random
 from util import size
 from evaluation import Judge
 import model
 import networkx as nx
-
-# The sample size of testing set
-SAMPLE_SIZE = 10000
-# the k in F1@k, recall@k, precision@k
-AT = 100
 
 def construct_graph_with_relation(input_file_name, verbose=False):
     '''
@@ -41,15 +39,35 @@ if __name__ == '__main__':
     parser.add_argument('--input', type=str, help='Enter Input File')
     args = parser.parse_args()
     
-    G = construct_graph_with_relation(args.input, verbose=True)
-    data_analysis(G)
-    judge = Judge(G)
-    judge.sample(SAMPLE_SIZE)
+    random.seed(0)
+    inputs = args.input.split(',')
+    auc_file = open('result/auc.csv', 'w')
+    f1_file = open('result/f1.csv', 'w')
     models = [model.CommonNeighbor, model.Jaccard, model.AdamicAdar, model.PreferentialAttachment, model.TotalNeighbors]
+    # write header
     for model in models:
-        print('we are evalute {0} model ...'.format(model.name()))
-        metrics = judge.evaluate(model, AT)
-        print('=' * 50)
+        auc_file.write(',' + model.name())
+        f1_file.write(',' + model.name())
+    auc_file.write('\n')
+    f1_file.write('\n')
+    
+    for input in inputs:
+        # write column
+        auc_file.write(os.path.basename(input).split('.')[0])
+        f1_file.write(os.path.basename(input).split('.')[0])
+        # Get the whole graph
+        G = construct_graph_with_relation(input, verbose=True)
+        data_analysis(G)
+        # Evaluate Model
+        judge = Judge(G)
+        for cur_model in models:
+            print('we are evalute {0} model ...'.format(cur_model.name()))
+            metrics = judge.evaluate(cur_model)
+            auc_file.write(',{0}'.format(metrics['AUC']))
+            f1_file.write(',{0}'.format(metrics['F1']))
+            print('=' * 50)
+        auc_file.write('\n')
+        f1_file.write('\n')
 
     
     
