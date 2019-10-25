@@ -1,11 +1,12 @@
 import argparse
+import random
 from util import size
 from evaluation import Judge
 import model
 import networkx as nx
 
 # The sample size of testing set
-SAMPLE_SIZE = 10000
+SAMPLE_SIZE = 1 * 100000
 # the k in F1@k, recall@k, precision@k
 AT = 100
 
@@ -41,14 +42,16 @@ if __name__ == '__main__':
     parser.add_argument('--input', type=str, help='Enter Input File')
     args = parser.parse_args()
     
+    random.seed(0)
+    # Get the whole graph
     G = construct_graph_with_relation(args.input, verbose=True)
     data_analysis(G)
+    # Evaluate Model
     judge = Judge(G)
-    judge.sample(SAMPLE_SIZE)
     models = [model.CommonNeighbor, model.Jaccard, model.AdamicAdar, model.PreferentialAttachment, model.TotalNeighbors]
     for model in models:
         print('we are evalute {0} model ...'.format(model.name()))
-        metrics = judge.evaluate(model, AT)
+        metrics = judge.evaluate(model)
         print('=' * 50)
 
     
