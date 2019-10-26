@@ -1,7 +1,8 @@
 import math
+import networkx as nx
 from util import size
 
-class Model:
+class Model:    
     def predict():
         pass
     
@@ -56,7 +57,35 @@ class TotalNeighbors(Model):
         n1 = set(G.neighbors(node1))
         n2 = set(G.neighbors(node2))
         return len(n1.union(n2))
-
+        
+# Global PageRank
+class PageRank:
+    def __init__(self):
+        self.pr = {}
+    
+    def name(self):
+        return 'PG'
+    
+    def train(self, G, alpha=0.15):
+        self.pr = nx.pagerank(G, alpha)
+        
+    def grid_search(self, G, judge, goal, alphas):
+        max_score = 0
+        best_param = alphas[0]
+        max_pr = {}
+        for alpha in alphas:
+            self.train(G, alpha)
+            score = judge.evaluate(self, goal=goal, option='valid')
+            if score > max_score:
+                max_score = score
+                max_pr = self.pr
+                best_param = alpha
+        # set the best pr
+        print('best param:{0}'.format(best_param))
+        self.pr = max_pr
+        
+    def predict(self, G, node1, node2):
+        return math.log(self.pr[node1]) + math.log(self.pr[node2])
         
 
 

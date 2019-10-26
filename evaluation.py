@@ -45,7 +45,7 @@ class Judge:
         for edge in self.train:
             self.G_train.add_edge(edge[0], edge[1])
     
-    def evaluate(self, model, option='test'):
+    def evaluate(self, model, option='test', goal='auc'):
         prediction_list = []
         if option == 'test':
             sample = self.test
@@ -62,17 +62,22 @@ class Judge:
             prediction_list.append([score,label])
         # python's default will use the first element to sort
         prediction_list.sort(reverse = True)
-        # calculate AUC
-        pred = [p[0] for p in prediction_list]
-        label = [p[1] for p in prediction_list]
-        auc = metrics.roc_auc_score(label, pred)
-        print('AUC: {0}'.format(auc))        
-        label_size = len([pred for pred in prediction_list if pred[1] == 1])
-        correct = 0
-        at = label_size
-        for pred in prediction_list[:at]:
-            if pred[1] == 1:
-                correct += 1
-        f1 = correct / at
-        print('F1: {0}'.format(f1))
-        return {'AUC': auc, 'F1': f1}
+        if goal == 'auc':
+            # calculate AUC
+            pred = [p[0] for p in prediction_list]
+            label = [p[1] for p in prediction_list]
+            auc = metrics.roc_auc_score(label, pred)
+            print('AUC: {0}'.format(auc))        
+            return auc
+        elif goal == 'f1':
+            # calculate f1 score
+            label_size = len([pred for pred in prediction_list if pred[1] == 1])
+            correct = 0
+            at = label_size
+            for pred in prediction_list[:at]:
+                if pred[1] == 1:
+                    correct += 1
+            f1 = correct / at
+            print('F1: {0}'.format(f1))
+            return f1
+            
