@@ -8,7 +8,7 @@ If you don't want to use pyenv or virtualenv, please at least look at `requireme
 
 ```
 pip install -r requirement.txt
-python main.py --input [file_name1,file_name2,...]
+python main.py --input [file_name1,file_name2,...] --goal [auc/f1]
 ```
 
 All the result will be at `/result` directory.
