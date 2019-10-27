@@ -2,10 +2,12 @@ import os
 import csv
 import argparse
 import random
+import matplotlib.pyplot as plt
 from util import size
 from evaluation import Judge
 import model
 import networkx as nx
+import itertools
 
 def construct_graph_with_relation(input_file_name, verbose=False):
     '''
@@ -34,10 +36,22 @@ def data_analysis(G):
     print('max degree: {}'.format(max(size(G.neighbors(n)) for n in G.nodes())))
     print('min degree: {}'.format(min(size(G.neighbors(n)) for n in G.nodes())))
     
+def draw_networks(G, n):
+    sample = nx.Graph()
+    nodes = random.sample(G.nodes(), n)
+    for node in nodes:
+        for n in nx.neighbors(G, node[0]):
+            sample.add_edge(node[0], n)
+            for nn in itertools.islice(nx.neighbors(G, n), 10):
+                sample.add_edge(n, nn)
+    nx.draw(sample)
+    plt.show()
+    
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', type=str, help='Enter Input File')
     parser.add_argument('--goal', type=str, help='auc/f1')
+    parser.add_argument('--draw', type=int, help='0~N (N is sample of nodes)', default=0)
     args = parser.parse_args()
     
     inputs = args.input.split(',')
@@ -61,6 +75,9 @@ if __name__ == '__main__':
         # Get the whole graph
         G = construct_graph_with_relation(input, verbose=True)
         data_analysis(G)
+        if args.draw > 0:
+            draw_networks(G, args.draw)
+            exit()
         judge = Judge(G)
         
         # grid search for best parameter 
