@@ -75,7 +75,7 @@ class Judge:
             correct = 0
             at = label_size
             for pred in prediction_list[:at]:
-                if pred[1] == 1:
+                if pred[1] == 1 and pred[0] != 0:
                     correct += 1
             f1 = correct / at
             print('F1: {0}'.format(f1))
