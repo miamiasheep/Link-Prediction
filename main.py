@@ -57,7 +57,7 @@ if __name__ == '__main__':
     inputs = args.input.split(',')
     goal = args.goal
     output_file = open('result/{0}.csv'.format(goal), 'w')
-    
+
     # pagerank is a dynamic model with parameter
     pr = model.PageRank()
     models = [model.CommonNeighbor, model.Jaccard, model.AdamicAdar, model.PreferentialAttachment, model.TotalNeighbors, pr]

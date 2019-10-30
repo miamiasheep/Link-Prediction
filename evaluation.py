@@ -16,11 +16,13 @@ class Judge:
     
     def sample_negatives(self, num_samples):
         ans = []
-        for i in range(num_samples):
+        count = 0
+        while count < num_samples:
             cand = random.sample(self.nodes, 2)
             neg_edge = (cand[0], cand[1])
             if neg_edge not in self.edges_set:
                 ans.append(neg_edge)
+                count += 1
         return ans
     
     def divide_into_train_valid_testing_set(self, train_ratio=0.8, valid_ratio=0.1, test_ratio=0.1):

@@ -1,6 +1,6 @@
 import os
 
-file_names = ['arxiv.txt','Celegans.txt','facebook.txt','NS.txt','PB.txt','Power.txt','Router.txt','USAir.txt','Yeast.txt']
+file_names = ['Celegans.txt','facebook.txt','NS.txt','PB.txt','Power.txt','Router.txt','USAir.txt','Yeast.txt']
 for i in range(len(file_names)):
     file_names[i] = os.path.join('data', file_names[i])
 
