@@ -82,7 +82,7 @@ if __name__ == '__main__':
         
         # grid search for best parameter 
         alphas = [0.1, 0.2, 0.3, 0.5, 0.7, 0.9, 0.95]
-        pr.grid_search(G, judge, goal, alphas)
+        pr.grid_search(judge.G_train, judge, goal, alphas)
         
         # Evaluate Model
         for cur_model in models:
