@@ -1,6 +1,7 @@
 import math
 import networkx as nx
 from util import size
+import numpy as np 
 
 class Model:    
     def predict():
@@ -86,7 +87,49 @@ class PageRank:
         
     def predict(self, G, node1, node2):
         return math.log(self.pr[node1]) + math.log(self.pr[node2])
-        
+
+# Katz Similarity
+class Katz:
+    def __init__(self):
+        self.s = [] # closed form of katz index
+        self.mapping = {}
+
+    def name(self):
+        return "Katz"
+
+    def train(self, G, beta):
+        A = np.array(nx.adjacency_matrix(G).todense())
+        dim_A = len(A)
+        epi = 0.01 # to avoid singular matrix problem
+        self.s = np.linalg.inv(np.eye(dim_A)*(1+epi) - beta*A) - np.eye(dim_A)
+
+    def grid_search(self, G, G_edges, judge, goal, betas):
+        max_score = 0
+        best_param = betas[0]
+        max_s = []
+
+        idx = 0
+        for node in set(G):
+            self.mapping[node] = idx
+            idx += 1
+
+        G_train_indexed = nx.Graph()
+        for edge in G_edges:
+            G_train_indexed.add_edge(self.mapping[edge[0]], self.mapping[edge[1]])
+
+        for beta in betas:
+            self.train(G_train_indexed, beta)
+            score = judge.evaluate(self, goal=goal, option='valid')
+            if score > max_score:
+                max_score = score
+                max_s = self.s
+                best_param = beta
+        print('best param:{0}'.format(best_param))
+        self.s = max_s
+
+    def predict(self, G, node1, node2):
+        return self.s[self.mapping[node1]][self.mapping[node2]]
+
 
 
 

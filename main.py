@@ -60,7 +60,8 @@ if __name__ == '__main__':
 
     # pagerank is a dynamic model with parameter
     pr = model.PageRank()
-    models = [model.CommonNeighbor, model.Jaccard, model.AdamicAdar, model.PreferentialAttachment, model.TotalNeighbors, pr]
+    katz = model.Katz()
+    models = [model.CommonNeighbor, model.Jaccard, model.AdamicAdar, model.PreferentialAttachment, model.TotalNeighbors, pr, katz]
     
     # write header
     for cur_model in models:
@@ -84,6 +85,9 @@ if __name__ == '__main__':
         alphas = [0.1, 0.2, 0.3, 0.5, 0.7, 0.9, 0.95]
         pr.grid_search(judge.G_train, judge, goal, alphas)
         
+        betas = [0.1, 0.2, 0.3, 0.5, 0.7, 0.9, 0.95]
+        katz.grid_search(judge.G_train, judge.train, judge, goal, betas)
+
         # Evaluate Model
         for cur_model in models:
             print('we are evalute {0} model ...'.format(cur_model.name()))
