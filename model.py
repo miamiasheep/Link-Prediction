@@ -97,7 +97,6 @@ class Katz:
         return "Katz"
 
     def train(self, G, beta):
-        length = len(set(G))
         A = np.array(nx.adjacency_matrix(G).todense())
         dim_A = len(A)
         epi = 0.00001 # to avoid singular matrix problem

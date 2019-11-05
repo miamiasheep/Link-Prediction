@@ -5,14 +5,12 @@ def size(iter):
 
 def generate_indexed_graph(G):
     mapping = {}
-    nodes = set()
     idx = 0
     G_index = nx.Graph()
     for edge in G.edges():
         for i in range(2):
-            if edge[i] not in nodes:
+            if edge[i] not in mapping:
                 mapping[edge[i]] = idx
                 idx += 1
-                nodes.add(edge[i])
         G_index.add_edge(mapping[edge[0]], mapping[edge[1]])
     return G_index, mapping
