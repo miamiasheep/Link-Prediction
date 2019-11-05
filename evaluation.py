@@ -46,8 +46,9 @@ class Judge:
         self.G_train = nx.Graph()
         for edge in self.train:
             self.G_train.add_edge(edge[0], edge[1])
+
     
-    def evaluate(self, model, option='test', goal='auc'):
+    def evaluate(self, model, option='test', goal='auc', mapping=None):
         prediction_list = []
         if option == 'test':
             sample = self.test
@@ -59,7 +60,7 @@ class Judge:
         for node1, node2 in sample:
             if node1 not in node_train or node2 not in node_train:
                 continue
-            score = model.predict(self.G_train, node1, node2)
+            score = model.predict(self.G_train, node1, node2, mapping)
             label = 1 if (node1, node2) in self.edges_set else 0
             prediction_list.append([score,label])
         # python's default will use the first element to sort

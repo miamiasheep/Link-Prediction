@@ -3,7 +3,7 @@ import csv
 import argparse
 import random
 import matplotlib.pyplot as plt
-from util import size
+from util import size, generate_indexed_graph
 from evaluation import Judge
 import model
 import networkx as nx
@@ -60,8 +60,10 @@ if __name__ == '__main__':
 
     # pagerank is a dynamic model with parameter
     pr = model.PageRank()
-    models = [model.CommonNeighbor, model.Jaccard, model.AdamicAdar, model.PreferentialAttachment, model.TotalNeighbors, pr]
-    
+    katz = model.Katz()
+    rwr = model.RWR()
+    models = [model.CommonNeighbor, model.Jaccard, model.AdamicAdar, model.PreferentialAttachment, model.TotalNeighbors, pr, katz, rwr]
+
     # write header
     for cur_model in models:
         output_file.write(',' + cur_model.name())
@@ -84,10 +86,16 @@ if __name__ == '__main__':
         alphas = [0.1, 0.2, 0.3, 0.5, 0.7, 0.9, 0.95]
         pr.grid_search(judge.G_train, judge, goal, alphas)
         
+        betas = [1e-07, 1e-06, 0.00001, 0.0001, 0.001, 0.01, 0.1]
+        G_train_indexed, mapping = generate_indexed_graph(judge.G_train)
+        katz.grid_search(G_train_indexed, judge, goal, betas, mapping)
+        betas = [0.1, 0.2, 0.3, 0.5, 0.7, 0.9, 0.95]
+        rwr.grid_search(G_train_indexed, judge, goal, betas, mapping)
+
         # Evaluate Model
         for cur_model in models:
             print('we are evalute {0} model ...'.format(cur_model.name()))
-            score = judge.evaluate(cur_model, goal=goal)
+            score = judge.evaluate(cur_model, goal=goal, mapping = mapping)
             output_file.write(',{0}'.format(score))
             print('=' * 50)
         output_file.write('\n')
