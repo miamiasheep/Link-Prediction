@@ -11,7 +11,7 @@ class CommonNeighbor(Model):
     def name():
         return 'CN'
     
-    def predict(G, node1, node2):
+    def predict(G, node1, node2, mapping):
         n1 = set(G.neighbors(node1))
         n2 = set(G.neighbors(node2))
         return len(n1.intersection(n2))
@@ -20,7 +20,7 @@ class Jaccard(Model):
     def name():
         return 'JAC'
         
-    def predict(G, node1, node2):
+    def predict(G, node1, node2, mapping):
         n1 = set(G.neighbors(node1))
         n2 = set(G.neighbors(node2))
         int_count = len(n1.intersection(n2))
@@ -32,7 +32,7 @@ class AdamicAdar(Model):
     def name():
         return 'AA'
 
-    def predict(G, node1, node2):
+    def predict(G, node1, node2, mapping):
         n1 = set(G.neighbors(node1))
         n2 = set(G.neighbors(node2))
         cn_set = n1.intersection(n2)
@@ -44,7 +44,7 @@ class PreferentialAttachment(Model):
     def name():
         return 'PA'
 
-    def predict(G, node1, node2):
+    def predict(G, node1, node2, mapping):
         n1 = set(G.neighbors(node1))
         n2 = set(G.neighbors(node2))
         return len(n1)*len(n2)
@@ -54,7 +54,7 @@ class TotalNeighbors(Model):
     def name():
         return 'TN'
 
-    def predict(G, node1, node2):
+    def predict(G, node1, node2, mapping):
         n1 = set(G.neighbors(node1))
         n2 = set(G.neighbors(node2))
         return len(n1.union(n2))
@@ -85,14 +85,13 @@ class PageRank:
         print('best param:{0}'.format(best_param))
         self.pr = max_pr
         
-    def predict(self, G, node1, node2):
+    def predict(self, G, node1, node2, mapping):
         return math.log(self.pr[node1]) + math.log(self.pr[node2])
 
 # Katz Similarity
 class Katz:
     def __init__(self):
         self.s = [] # closed form of katz index
-        self.mapping = {}
 
     def name(self):
         return "Katz"
@@ -103,23 +102,14 @@ class Katz:
         epi = 0.01 # to avoid singular matrix problem
         self.s = np.linalg.inv(np.eye(dim_A)*(1+epi) - beta*A) - np.eye(dim_A)
 
-    def grid_search(self, G, G_edges, judge, goal, betas):
+    def grid_search(self, G, judge, goal, betas, mapping):
         max_score = 0
         best_param = betas[0]
         max_s = []
 
-        idx = 0
-        for node in set(G):
-            self.mapping[node] = idx
-            idx += 1
-
-        G_train_indexed = nx.Graph()
-        for edge in G_edges:
-            G_train_indexed.add_edge(self.mapping[edge[0]], self.mapping[edge[1]])
-
         for beta in betas:
-            self.train(G_train_indexed, beta)
-            score = judge.evaluate(self, goal=goal, option='valid')
+            self.train(G, beta)
+            score = judge.evaluate(self, goal=goal, option='valid', mapping=mapping)
             if score > max_score:
                 max_score = score
                 max_s = self.s
@@ -127,9 +117,45 @@ class Katz:
         print('best param:{0}'.format(best_param))
         self.s = max_s
 
-    def predict(self, G, node1, node2):
-        return self.s[self.mapping[node1]][self.mapping[node2]]
+    def predict(self, G, node1, node2, mapping):
+        return self.s[mapping[node1]][mapping[node2]]
 
+# Random Walk with Restart index
+# reference: https://cran.r-project.org/web/packages/linkprediction/vignettes/proxfun.html#random-walk-with-restart-rwr
+class RWR:
+    def __init__(self):
+        self.s = []
+
+    def name(self):
+        return "Random Walk with Restart"
+
+    def train(self, G, beta):
+        dim_G = len(set(G))
+        transition_matrix = [[0]*dim_G for _ in range(dim_G)]
+        for node, neighbors in G.adjacency():
+            neighbors_size = len(neighbors)
+            for neighbor in neighbors:
+                transition_matrix[node][neighbor] = 1/neighbors_size
+
+        self.s = beta*np.linalg.inv(np.eye(dim_G) - (1-beta)*np.transpose(transition_matrix))
+
+    def grid_search(self, G, judge, goal, betas, mapping):
+        max_score = 0
+        best_param = betas[0]
+        max_s = []
+
+        for beta in betas:
+            self.train(G, beta)
+            score = judge.evaluate(self, goal=goal, option='valid', mapping=mapping)
+            if score > max_score:
+                max_score = score
+                max_s = self.s
+                best_param = beta
+        print('best param:{0}'.format(best_param))
+        self.s = max_s
+
+    def predict(self, G, node1, node2, mapping):
+        return self.s[mapping[node1]][mapping[node2]] + self.s[mapping[node2]][mapping[node1]]
 
 
 
