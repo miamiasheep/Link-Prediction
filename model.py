@@ -97,9 +97,10 @@ class Katz:
         return "Katz"
 
     def train(self, G, beta):
+        length = len(set(G))
         A = np.array(nx.adjacency_matrix(G).todense())
         dim_A = len(A)
-        epi = 0.01 # to avoid singular matrix problem
+        epi = 0.00001 # to avoid singular matrix problem
         self.s = np.linalg.inv(np.eye(dim_A)*(1+epi) - beta*A) - np.eye(dim_A)
 
     def grid_search(self, G, judge, goal, betas, mapping):

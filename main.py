@@ -3,7 +3,7 @@ import csv
 import argparse
 import random
 import matplotlib.pyplot as plt
-from util import size, mapping_graph
+from util import size, generate_indexed_graph
 from evaluation import Judge
 import model
 import networkx as nx
@@ -86,12 +86,10 @@ if __name__ == '__main__':
         alphas = [0.1, 0.2, 0.3, 0.5, 0.7, 0.9, 0.95]
         pr.grid_search(judge.G_train, judge, goal, alphas)
         
-        betas = [0.1, 0.2, 0.3, 0.5, 0.7, 0.9, 0.95]
-        mapping = mapping_graph(judge.G_train)
-        G_train_indexed = nx.Graph()
-        for edge in judge.train:
-            G_train_indexed.add_edge(mapping[edge[0]], mapping[edge[1]])
+        betas = [1e-07, 1e-06, 0.00001, 0.0001, 0.001, 0.01, 0.1]
+        G_train_indexed, mapping = generate_indexed_graph(judge.G_train)
         katz.grid_search(G_train_indexed, judge, goal, betas, mapping)
+        betas = [0.1, 0.2, 0.3, 0.5, 0.7, 0.9, 0.95]
         rwr.grid_search(G_train_indexed, judge, goal, betas, mapping)
 
         # Evaluate Model
