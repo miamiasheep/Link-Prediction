@@ -155,7 +155,8 @@ class RWR:
         self.s = max_s
 
     def predict(self, G, node1, node2, mapping):
-        return self.s[mapping[node1]][mapping[node2]] + self.s[mapping[node2]][mapping[node1]]
+        epi = 0.01
+        return math.log(self.s[mapping[node1]][mapping[node2]] + epi) + math.log(self.s[mapping[node2]][mapping[node1]] + epi)
 
 
 
