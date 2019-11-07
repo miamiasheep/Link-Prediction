@@ -1,19 +1,39 @@
 import math
 import random
+import os
 import networkx as nx
 import numpy as np
 from sklearn import metrics
 
 class Judge:
-    def __init__(self, G):
+    def __init__(self, G, input):
         self.samples = []
         self.G = G
+        self.input = os.path.basename(input).split('.')[0]
         self.nodes = [n for n in G.nodes()]
         self.edges = [e for e in G.edges()]
         self.edges_set = set(self.edges)
         self.divide_into_train_valid_testing_set()
+        self.export_data_to_mf_format()
         self.create_train_graph()
     
+    def export_data_to_mf_format(self):
+        if not os.path.isdir('mf'):
+            os.mkdir('mf')
+        train_file =  open(os.path.join('mf', self.input + '.train'), 'w')
+        valid_file = open(os.path.join('mf', self.input + '.valid'), 'w')
+        test_file = open(os.path.join('mf', self.input + '.test'), 'w') 
+        for edge in self.train:
+            train_file.write('{0} {1} 1\n'.format(edge[0], edge[1]))
+        for edge in self.valid:
+            valid_file.write('{0} {1} 1\n'.format(edge[0], edge[1]))
+        for edge in self.valid_neg:
+            valid_file.write('{0} {1} 0\n'.format(edge[0], edge[1]))
+        for edge in self.test:
+            test_file.write('{0} {1} 1\n'.format(edge[0], edge[1]))
+        for edge in self.test_neg:
+            test_file.write('{0} {1} 0\n'.format(edge[0], edge[1]))
+            
     def sample_negatives(self, num_samples):
         ans = []
         count = 0
@@ -27,6 +47,7 @@ class Judge:
     
     def divide_into_train_valid_testing_set(self, train_ratio=0.8, valid_ratio=0.1, test_ratio=0.1):
         random.shuffle(self.edges)
+        
         # divide into train, valid, test
         train_index = math.floor(len(self.edges) * train_ratio)
         valid_index = math.floor(len(self.edges) * valid_ratio) + train_index
@@ -34,13 +55,10 @@ class Judge:
         
         # validation set contains 1:1 negative edge sampling
         self.valid = self.edges[train_index:valid_index]
-        neg_samples = self.sample_negatives(len(self.valid))
-        for neg_sample in neg_samples:
-            self.valid.append(neg_sample)
+        self.valid_neg = self.sample_negatives(len(self.valid))
+        
         self.test = self.edges[valid_index:]
-        neg_samples = self.sample_negatives(len(self.valid))
-        for neg_sample in neg_samples:
-            self.test.append(neg_sample)
+        self.test_neg = self.sample_negatives(len(self.test))
     
     def create_train_graph(self):
         self.G_train = nx.Graph()
@@ -52,8 +70,12 @@ class Judge:
         prediction_list = []
         if option == 'test':
             sample = self.test
+            for neg_sample in self.test_neg:
+                sample.append(neg_sample)
         elif option == 'valid':
             sample = self.valid
+            for neg_sample in self.valid_neg:
+                sample.append(neg_sample)
         else:
             print('wrong option should be test/valid')
         node_train = set([node for node in self.G_train.nodes()])

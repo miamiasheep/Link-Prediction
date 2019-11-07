@@ -80,12 +80,10 @@ if __name__ == '__main__':
         if args.draw > 0:
             draw_networks(G, args.draw)
             exit()
-        judge = Judge(G)
-        
+        judge = Judge(G, input)
         # grid search for best parameter 
         alphas = [0.1, 0.2, 0.3, 0.5, 0.7, 0.9, 0.95]
         pr.grid_search(judge.G_train, judge, goal, alphas)
-        
         betas = [1e-07, 1e-06, 0.00001, 0.0001, 0.001, 0.01, 0.1]
         G_train_indexed, mapping = generate_indexed_graph(judge.G_train)
         katz.grid_search(G_train_indexed, judge, goal, betas, mapping)
