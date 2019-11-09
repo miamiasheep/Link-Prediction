@@ -14,24 +14,36 @@ class Judge:
         self.edges = [e for e in G.edges()]
         self.edges_set = set(self.edges)
         self.divide_into_train_valid_testing_set()
-        self.export_data_to_mf_format()
         self.create_train_graph()
+        self.export_data_to_mf_format()
     
     def export_data_to_mf_format(self):
+        self.node_train = set([node for node in self.G_train.nodes()])
+
         if not os.path.isdir('mf'):
             os.mkdir('mf')
         train_file =  open(os.path.join('mf', self.input + '.train'), 'w')
         valid_file = open(os.path.join('mf', self.input + '.valid'), 'w')
         test_file = open(os.path.join('mf', self.input + '.test'), 'w') 
         for edge in self.train:
+            if edge[0] not in self.node_train or edge[1] not in self.node_train:
+                continue
             train_file.write('{0} {1} 1\n'.format(edge[0], edge[1]))
         for edge in self.valid:
+            if edge[0] not in self.node_train or edge[1] not in self.node_train:
+                continue
             valid_file.write('{0} {1} 1\n'.format(edge[0], edge[1]))
         for edge in self.valid_neg:
+            if edge[0] not in self.node_train or edge[1] not in self.node_train:
+                continue
             valid_file.write('{0} {1} 0\n'.format(edge[0], edge[1]))
         for edge in self.test:
+            if edge[0] not in self.node_train or edge[1] not in self.node_train:
+                continue
             test_file.write('{0} {1} 1\n'.format(edge[0], edge[1]))
         for edge in self.test_neg:
+            if edge[0] not in self.node_train or edge[1] not in self.node_train:
+                continue
             test_file.write('{0} {1} 0\n'.format(edge[0], edge[1]))
             
     def sample_negatives(self, num_samples):
@@ -78,9 +90,8 @@ class Judge:
                 sample.append(neg_sample)
         else:
             print('wrong option should be test/valid')
-        node_train = set([node for node in self.G_train.nodes()])
         for node1, node2 in sample:
-            if node1 not in node_train or node2 not in node_train:
+            if node1 not in self.node_train or node2 not in self.node_train:
                 continue
             score = model.predict(self.G_train, node1, node2, mapping)
             label = 1 if (node1, node2) in self.edges_set else 0
