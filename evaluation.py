@@ -13,6 +13,7 @@ class Judge:
         self.edges_set = set(self.edges)
         self.divide_into_train_valid_testing_set()
         self.create_train_graph()
+        self.edges_set_train = set(self.train)
     
     def sample_negatives(self, num_samples):
         ans = []
@@ -47,7 +48,62 @@ class Judge:
         for edge in self.train:
             self.G_train.add_edge(edge[0], edge[1])
 
-    
+
+
+    # 1:1 negative, positive
+    def generate_pairs_for_training(self):
+        neg = []
+        count = 0
+        num_samples = len(self.train)
+        node_train = set([node for node in self.G_train.nodes()])
+        while count < num_samples:
+            cand = random.sample(node_train, 2)
+            neg_edge = (cand[0], cand[1])
+            if neg_edge not in self.edges_set_train:
+                neg.append(neg_edge)
+                count += 1
+
+        return [neg, self.train]
+
+
+    def generate_heuristics_features_training(self, model, mapping, negative_pairs, positive_pairs):
+        length = len(negative_pairs)
+        neg_score = []
+        pos_score = []
+        for node1, node2 in negative_pairs:
+            score = model.predict(self.G_train, node1, node2, mapping)
+            neg_score.append(score)
+        for node1, node2 in positive_pairs:
+            score = model.predict(self.G_train, node1, node2, mapping)
+            pos_score.append(score)
+        return neg_score+pos_score
+
+
+    def generate_heuristics_features_testing(self, model, mapping):
+        scores = []
+        sample = self.test
+        node_train = set([node for node in self.G_train.nodes()])
+        for node1, node2 in sample:
+            if node1 not in node_train or node2 not in node_train:
+                continue
+            score = model.predict(self.G_train, node1, node2, mapping)
+            scores.append(score)
+        return scores
+
+
+    def generate_labels_test(self):
+        labels = []
+        sample = self.test
+        node_train = set([node for node in self.G_train.nodes()])
+        for node1, node2 in sample:
+            if node1 not in node_train or node2 not in node_train:
+                continue
+            label = 1 if (node1, node2) in self.edges_set else 0
+            labels.append(label)
+        return labels
+
+
+
     def evaluate(self, model, option='test', goal='auc', mapping=None):
         prediction_list = []
         if option == 'test':
@@ -65,6 +121,8 @@ class Judge:
             prediction_list.append([score,label])
         # python's default will use the first element to sort
         prediction_list.sort(reverse = True)
+        #from collections import Counter
+        #print("哇哈哈", Counter([i[1] for i in prediction_list]))
         if goal == 'auc':
             # calculate AUC
             pred = [p[0] for p in prediction_list]
