@@ -78,7 +78,7 @@ class Judge:
             self.G_train.add_edge(edge[0], edge[1])
 
     
-    def evaluate(self, model, option='test', goal='auc', mapping=None):
+    def evaluate(self, model, option='test', goal='auc', mapping=None, at=0):
         prediction_list = []
         if option == 'test':
             sample = self.test
@@ -105,15 +105,16 @@ class Judge:
             auc = metrics.roc_auc_score(label, pred)
             print('AUC: {0}'.format(auc))        
             return auc
-        elif goal == 'f1':
-            # calculate f1 score
-            label_size = len([pred for pred in prediction_list if pred[1] == 1])
+        elif goal == 'acc':
+            # calculate acc score
+            if at == 0:
+                label_size = len([pred for pred in prediction_list if pred[1] == 1])
+                at = label_size
             correct = 0
-            at = label_size
             for pred in prediction_list[:at]:
                 if pred[1] == 1 and pred[0] != 0:
                     correct += 1
-            f1 = correct / at
-            print('F1: {0}'.format(f1))
-            return f1
+            acc = correct / at
+            print('acc: {0}'.format(acc))
+            return acc
             
