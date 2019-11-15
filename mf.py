@@ -50,9 +50,9 @@ if __name__ == '__main__':
                 words = line.split()
                 dup.write('{} {} {}\n'.format(words[1], words[0], words[2]))
             dup.close()
-            run('{0} -f 10 -t 150 --quiet {1}.dup {1}.model'.format(os.path.join(base, 'mf-train'), os.path.join(data_base, input)))
+            run('{0} -f 10 -t 300 -k 15 --quiet {1}.dup {1}.model'.format(os.path.join(base, 'mf-train'), os.path.join(data_base, input)))
         else:
-            run('{0} -f 10 -t 300 --quiet {1}.train {1}.model'.format(os.path.join(base, 'mf-train'), os.path.join(data_base, input)))
+            run('{0} -f 10 -t 300 -k 15 --quiet {1}.train {1}.model'.format(os.path.join(base, 'mf-train'), os.path.join(data_base, input)))
         run('{0} -e 12 {1}.test {1}.model {1}.pred'.format(os.path.join(base, 'mf-predict'), os.path.join(data_base, input)))
         score = evaluate(os.path.join(data_base, input) + '.pred', os.path.join(data_base, input) + '.test', args.goal)
         output.write('{0}, {1}\n'.format(input, score))
