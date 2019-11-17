@@ -42,3 +42,10 @@ All the result will be at `/result` directory.
 
 `result/mf_dup_f1.csv` record the result of f1@(label_size) in different data set using matrix mactorization using duplicate data.
 
+`/result/f1.csv` record the result of f1 score @ (#positive labels) in different data set using different methods.
+
+## ensemble heuristics
+You can find training and testing sets with heuristics values as feature vectors in `/ml_heuristics`. 
+
+With those datasets, you can easily build a machine learning model. We use randomforest and logistic regression for examples. You can see the examples in `/ml_heuristics/playground.ipynb`. And the stored results (auc/f1) can be found in `/result/[auc, f1].csv`. 
+

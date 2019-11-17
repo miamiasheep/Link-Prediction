@@ -8,6 +8,7 @@ from evaluation import Judge
 import model
 import networkx as nx
 import itertools
+import pandas as pd 
 
 def construct_graph_with_relation(input_file_name, verbose=False):
     '''
@@ -92,6 +93,8 @@ if __name__ == '__main__':
         betas = [0.1, 0.2, 0.3, 0.5, 0.7, 0.9, 0.95]
         rwr.grid_search(G_train_indexed, judge, goal, betas, mapping, at)
 
+
+        
         # Evaluate Model
         for cur_model in models:
             print('we are evalute {0} model ...'.format(cur_model.name()))
@@ -99,6 +102,28 @@ if __name__ == '__main__':
             output_file.write(',{0}'.format(score))
             print('=' * 50)
         output_file.write('\n')
+
+        # output heuristics_features for training
+        pairs = judge.generate_pairs_for_training()
+        df = pd.DataFrame()
+        for cur_model in models:
+            df[cur_model.name()] = judge.generate_heuristics_features_training(cur_model, mapping, pairs[0], pairs[1])
+        df['label'] = [0]*len(pairs[0]) + [1]*len(pairs[1])
+        file_name = os.path.basename(input).split('.')[0]
+        df.to_csv('ml_heuristics/{}_training.csv'.format(file_name), index=False)
+
+        # output heuristics_features for testing
+        df = pd.DataFrame()
+        for cur_model in models:
+            df[cur_model.name()] = judge.generate_heuristics_features_testing(cur_model, mapping)
+        df['label'] = judge.generate_labels_test()
+        df.to_csv('ml_heuristics/{}_testing.csv'.format(file_name), index=False)
+
+
+
+
+
+
 
     
     
