@@ -51,13 +51,15 @@ def draw_networks(G, n):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', type=str, help='Enter Input File')
-    parser.add_argument('--goal', type=str, help='auc/f1')
+    parser.add_argument('--goal', type=str, help='auc/acc')
     parser.add_argument('--draw', type=int, help='0~N (N is sample of nodes)', default=0)
+    parser.add_argument('--at', type=int, help='0~N(0 is for label size)', default=0)
     args = parser.parse_args()
     
     inputs = args.input.split(',')
     goal = args.goal
-    output_file = open('result/{0}.csv'.format(goal), 'w')
+    at = args.at
+    output_file = open('result/{0}_{1}.csv'.format(goal, at), 'w')
 
     # pagerank is a dynamic model with parameter
     pr = model.PageRank()
@@ -81,24 +83,22 @@ if __name__ == '__main__':
         if args.draw > 0:
             draw_networks(G, args.draw)
             exit()
-        judge = Judge(G)
-        
+        judge = Judge(G, input)
         # grid search for best parameter 
         alphas = [0.1, 0.2, 0.3, 0.5, 0.7, 0.9, 0.95]
-        pr.grid_search(judge.G_train, judge, goal, alphas)
-        
+        pr.grid_search(judge.G_train, judge, goal, alphas, at)
         betas = [1e-07, 1e-06, 0.00001, 0.0001, 0.001, 0.01, 0.1]
         G_train_indexed, mapping = generate_indexed_graph(judge.G_train)
-        katz.grid_search(G_train_indexed, judge, goal, betas, mapping)
+        katz.grid_search(G_train_indexed, judge, goal, betas, mapping, at)
         betas = [0.1, 0.2, 0.3, 0.5, 0.7, 0.9, 0.95]
-        rwr.grid_search(G_train_indexed, judge, goal, betas, mapping)
+        rwr.grid_search(G_train_indexed, judge, goal, betas, mapping, at)
 
 
         
         # Evaluate Model
         for cur_model in models:
             print('we are evalute {0} model ...'.format(cur_model.name()))
-            score = judge.evaluate(cur_model, goal=goal, mapping = mapping)
+            score = judge.evaluate(cur_model, goal=goal, mapping=mapping, at=at)
             output_file.write(',{0}'.format(score))
             print('=' * 50)
         output_file.write('\n')

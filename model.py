@@ -70,13 +70,13 @@ class PageRank:
     def train(self, G, alpha=0.15):
         self.pr = nx.pagerank(G, alpha)
         
-    def grid_search(self, G, judge, goal, alphas):
+    def grid_search(self, G, judge, goal, alphas, at):
         max_score = 0
         best_param = alphas[0]
         max_pr = {}
         for alpha in alphas:
             self.train(G, alpha)
-            score = judge.evaluate(self, goal=goal, option='valid')
+            score = judge.evaluate(self, goal=goal, option='valid', at=at)
             if score > max_score:
                 max_score = score
                 max_pr = self.pr
@@ -102,14 +102,14 @@ class Katz:
         epi = 0.00001 # to avoid singular matrix problem
         self.s = np.linalg.inv(np.eye(dim_A)*(1+epi) - beta*A) - np.eye(dim_A)
 
-    def grid_search(self, G, judge, goal, betas, mapping):
+    def grid_search(self, G, judge, goal, betas, mapping, at):
         max_score = 0
         best_param = betas[0]
         max_s = []
 
         for beta in betas:
             self.train(G, beta)
-            score = judge.evaluate(self, goal=goal, option='valid', mapping=mapping)
+            score = judge.evaluate(self, goal=goal, option='valid', mapping=mapping, at=at)
             if score > max_score:
                 max_score = score
                 max_s = self.s
@@ -139,14 +139,14 @@ class RWR:
 
         self.s = beta*np.linalg.inv(np.eye(dim_G) - (1-beta)*np.transpose(transition_matrix))
 
-    def grid_search(self, G, judge, goal, betas, mapping):
+    def grid_search(self, G, judge, goal, betas, mapping, at):
         max_score = 0
         best_param = betas[0]
         max_s = []
 
         for beta in betas:
             self.train(G, beta)
-            score = judge.evaluate(self, goal=goal, option='valid', mapping=mapping)
+            score = judge.evaluate(self, goal=goal, option='valid', mapping=mapping, at=at)
             if score > max_score:
                 max_score = score
                 max_s = self.s
