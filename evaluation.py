@@ -39,7 +39,7 @@ class Judge:
         for neg_sample in neg_samples:
             self.valid.append(neg_sample)
         self.test = self.edges[valid_index:]
-        neg_samples = self.sample_negatives(len(self.valid))
+        neg_samples = self.sample_negatives(len(self.test))
         for neg_sample in neg_samples:
             self.test.append(neg_sample)
     
@@ -100,6 +100,7 @@ class Judge:
                 continue
             label = 1 if (node1, node2) in self.edges_set else 0
             labels.append(label)
+
         return labels
 
 
@@ -121,8 +122,6 @@ class Judge:
             prediction_list.append([score,label])
         # python's default will use the first element to sort
         prediction_list.sort(reverse = True)
-        #from collections import Counter
-        #print("哇哈哈", Counter([i[1] for i in prediction_list]))
         if goal == 'auc':
             # calculate AUC
             pred = [p[0] for p in prediction_list]
