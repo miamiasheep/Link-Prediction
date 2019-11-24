@@ -20,6 +20,10 @@ ex:
 python main.py --input [file_name1, file_name2, ...] --goal acc --at 10
 ```
 
+### Matrix Factorization
+
+First, you have to compile the libmf by `make` commands.
+
 If you want to use matrix factorization, you can execute:
 
 ```
