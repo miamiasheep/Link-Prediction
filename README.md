@@ -1,13 +1,28 @@
 # Purdue_ML_Course_Project
 ML project in Purdue Fall, 2019
 
+All the experiements are described in the following report.
+
+https://github.com/miamiasheep/Purdue_ML_Final_Project/blob/master/final_report.pdf
+
 ## How to run the program
-I suggest you use pyenv or virtualenv before executing following commands.
+
+#### Download the dependencies
+We suggest you use pyenv or virtualenv before executing following commands.
 
 If you don't want to use pyenv or virtualenv, please at least look at `requirement.txt` and see what packages we will download for you. 
 
 ```
 pip install -r requirement.txt
+```
+
+### Heuristic models
+
+You can reproduce all of our experiments about heuristic model using the following command.
+
+Input is the data set we already collected in the `data/` directory.
+
+```
 python main.py --input [file_name1,file_name2,...] --goal [auc/acc]
 ```
 
