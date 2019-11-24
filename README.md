@@ -22,7 +22,15 @@ python main.py --input [file_name1, file_name2, ...] --goal acc --at 10
 
 ### Matrix Factorization
 
-First, you have to compile the libmf by `make` commands.
+#### Disclaimer
+
+libmf is not made by us. It is a tool we download from:
+
+https://www.csie.ntu.edu.tw/~cjlin/libmf/
+
+#### How to reproduce our result
+
+First, you have to compile the libmf by `make` commands in libmf directory.
 
 If you want to use matrix factorization, you can execute:
 
@@ -31,6 +39,8 @@ python mf.py --goal [auc/f1] --dup [yes/no]
 ```
 
 It will perform matrix factorization on all of the data set. 
+
+### Result
 
 All the result will be at `/result` directory.
 
