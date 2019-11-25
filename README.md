@@ -16,6 +16,16 @@ If you don't want to use pyenv or virtualenv, please at least look at `requireme
 pip install -r requirement.txt
 ```
 
+### Draw Graph
+
+```
+python main.py --input file --draw [N(integer)]
+```
+
+We will draw the graph by random selecting N nodes and expand their neighbors and neighbors of neighbors. 
+
+For big graph(ex:FB), we suggest to set N to be 1.
+
 ### Heuristic models
 
 You can reproduce all of our experiments about heuristic model using the following command.
