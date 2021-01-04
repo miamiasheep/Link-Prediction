@@ -1,6 +1,4 @@
-# Purdue_ML_Course_Project
-ML project in Purdue Fall, 2019
-
+# Link Prediction
 All the experiements are described in the following report.
 
 https://github.com/miamiasheep/Purdue_ML_Final_Project/blob/master/final_report.pdf
